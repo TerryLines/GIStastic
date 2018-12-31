@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1546295523107.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "846096076",
+    "id" : "6DAD384E",
+    "lastKnownWriteTime" : 1546295567,
+    "last_content_update" : 1546295567048,
+    "path" : "~/GIT/GIS/GIStastic/Part1.Rmd",
+    "project_path" : "Part1.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "3,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
