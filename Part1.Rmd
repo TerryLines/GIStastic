@@ -1,19 +1,55 @@
 ---
-title: "R Notebook"
+title: "GIS Assessment"
 output: html_notebook
+bibliography: 
+ - Biblio.bib
 ---
+##Part 1: Mapping
+Two maps have been produced, based on an existing map for the Index of Multiple Deprivation (IMD). The widening ability to engage in cartography with disregard for existing practices, whilst problematic [@goodchild_gis_2009], can be viewed as an extension of critical cartography: authority is rejected through a plurality of views [@wood_critical_2009]. Maps, and their surrounding discourse, are propositions that position the mapmaker as authority [@wood_natures_2008], questioned through the production of alternatives.
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+These alternatives engage with two particular issues: firstly, the map’s use to reinforce the measure’s validity; secondly, the choropleth’s links to segregative concepts through partitioning space into units versus clinal variation [@crampton_rethinking_2011].
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+![Part of a government infographic introducing the IMD](IMD.png){width=500}
+
+###Methodology
+The IMD is the official small area measure of deprivation in England, produced by the UK government from administrative data to measure deprivation across 7 domains and 32,844 lower super output areas. The data is high quality - statistically robust, open access and well maintained. The IMD is constructed through combining exponentially-transformed domain scores .
+
+The first map highlights the subjectivity in dataset construction by reweighting the subdomains and combining them using a standardised normal transformation, reversing the choice that high deprivation is weighted more heavily than low deprivation. R’s statistical and data handling tools (using purrr and stats) does this efficiently and reproducibly:
 
 ```{r}
-plot(cars)
+data <- read_csv("File_7_ID_2015_All_ranks__deciles_and_scores_for_the_Indices_of_Deprivation__and_population_denominators.csv")
+ranks <- select(data,c(9,12,15,18,21,24,27))
+qdf <- 1-ranks/32845 #adding 1 to the number of items to avoid infinity errors
+scores <- purrr::map_dfc(qdf,stats::qnorm) #utilising stats function to create a standardised normal distribution
+weights <- c(0,0,1/5,1/5,1/5,1/5,1/5)  # c(0.225,0.225,0.135,0.135,.28/3,.28/3,.28/3) are the original weightings.
+IMD2 <-as.matrix(scores)%*%weights
+IMD2 <- as_tibble(IMD2)
+colnames(IMD2) <- "IMD2 Score"
+IMD2$"IMD2 Rank" <- rank(-IMD2$`IMD2 Score`)
+IMD2$"IMD2 Decile" <- ceiling(IMD2$`IMD2 Rank`/3284.4)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+To underscore its questioning of the original, it repeats its design choices as detailed below. While R’s tmap package has flexibility, the mapping is slow to render for a dataset of this size, making it less suitable for exploratory plotting, and the customisation of map elements is limited.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+![Map 1: An alternative IMD](map1clip.png){width=500}
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+The second map considers representation. Using the IMD, it replaces the choropleth with dots and alters colour to highlight the correlation between the two extremes of deprivation. QGIS was used as its inbuilt visualisation techniques and database management quickly creates different visualisations. Whilst not explicitly reproducible, the final methodology is evident in the map produced. 
+
+![Map 2: A dot based choropleth Index of Multiple Deprivation](map2clip.png){width=500}
+
+###Representation
+Good map design considers the map’s purpose and expected audience, structuring information accordingly and harmonising the aesthetics [@brewer_designing_2005]. The purpose of the IMD map is to visualise the constructed index, to an audience familiar with the practices of UK social science. As deprivation is conceived and measured through proportionate data connected to place, a choropleth mapping is suitable in order to show spatial correlations. The choropleth is a dominant mapping type in social science, despite its limitations such as ecological fallacy and modifiable areal unit problem. Its explicit use as a tool to shape understanding is clear from the widespread rejection of Tobler’s classless choropleths [@goodchild_gis_2009] .
+
+The information density of the measure itself is high, presented to LSOA detail across 10 classes. This reinforces a message of mapmakers authority through data complexity. A sequential Yellow-Green-Blue colour plette is used but with unusually high saturation and darker tone at the yellow end, increasing the visual dominace of low deprivation, de-emphasising middle values. To balance this, the UK is represented minimally through an outline shape, and there are no map reference elements (compass, scale, gridlines) reflecting audience familiarity. However, the lack of background manmade features also de-emphasises the potential causes of spatial patterning, consistent with a message of empirical objectivity.The minimal text and lack of methodological notes reinforces that message. 
+
+The second map differs through the use of dot centroids for LSOAs, to avoid the misleading effect of area. This de-emphasises rural areas, linking deprivation to cities. The divergent hues chosen for the measures colour scheme reinforces the extremes [@brewer_designing_2005]. Hence, this map proposes a connection between deprivation and the built environment, characterised by affluent suburbs and deprived inner cities. QGIS's addiitonal fuctionality allows improved title hierarchy and use of a cutout for the  the Isles of Scilly to balance white space.  
+
+
+
+
+
+
+
+
+
 
